@@ -1,13 +1,13 @@
 {
   "name": "Tension Pool",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "manifest_version": 1,
   "description": "ระบบ Tension Pool สำหรับสำรวจดันเจี้ยน: สะสมเต๋า d6 แล้วทอยลุ้นเหตุการณ์แทรกซ้อน",
-  "author": "Your Name",
+  "author": "gemini3234121-source",
   "action": {
     "title": "Tension Pool",
-    "icon": "icon.svg",
-    "popover": "index.html",
+    "icon": "https://gemini3234121-source.github.io/Tension-Pool/icon.svg",
+    "popover": "https://gemini3234121-source.github.io/Tension-Pool/index.html",
     "width": 400,
     "height": 590
   }
