@@ -1,0 +1,14 @@
+{
+  "name": "Tension Pool",
+  "version": "1.0.0",
+  "manifest_version": 1,
+  "description": "ระบบ Tension Pool สำหรับสำรวจดันเจี้ยน: สะสมเต๋า d6 แล้วทอยลุ้นเหตุการณ์แทรกซ้อน",
+  "author": "Your Name",
+  "action": {
+    "title": "Tension Pool",
+    "icon": "icon.svg",
+    "popover": "index.html",
+    "width": 400,
+    "height": 590
+  }
+}

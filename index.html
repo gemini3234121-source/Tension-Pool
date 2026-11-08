@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tension Pool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header>
+    <h1>Tension Pool</h1>
+    <span id="role" class="chip"></span>
+  </header>
+
+  <section class="meter">
+    <div class="count"><b id="n">0</b><span>/ 6</span></div>
+    <p id="hint"></p>
+  </section>
+
+  <section id="tray" class="tray" aria-live="polite"></section>
+
+  <div id="lock" class="lock" hidden>
+    <p>DM ซ่อน Pool ไว้</p>
+    <small>ความตึงเครียดกำลังสะสมอยู่ในความมืด…</small>
+  </div>
+
+  <div id="banner" class="banner" hidden></div>
+
+  <section id="gm" class="gm" hidden>
+    <div class="row">
+      <button id="addTime">+ เวลาผ่านไป 10 นาที</button>
+      <button id="addNoise" class="noise">+ เสียงดัง</button>
+    </div>
+    <div class="row">
+      <button id="remove" class="ghost">ลบ 1 ลูก</button>
+      <button id="roll" class="roll">ทอย Pool</button>
+    </div>
+    <div class="row foot">
+      <label class="switch">
+        <input type="checkbox" id="visible">
+        <span class="track"></span>
+        <span>ให้ผู้เล่นเห็น Pool</span>
+      </label>
+      <button id="reset" class="ghost">เริ่มใหม่</button>
+    </div>
+    <p id="odds" class="odds"></p>
+  </section>
+</main>
+<script type="module" src="main.js"></script>
+</body>
+</html>
