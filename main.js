@@ -1,4 +1,4 @@
-import OBR from "https://cdn.jsdelivr.net/npm/@owlbear-rodeo/sdk@3";
+import OBR from "https://cdn.jsdelivr.net/npm/@owlbear-rodeo/sdk@3/+esm";
 
 const KEY = "com.tensionpool/state";
 const FULL = 6;
