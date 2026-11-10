@@ -1,88 +1,59 @@
-:root{
-  --s:34px; --slot:40px;
-  --bone:#e9dfc6; --bone-shade:#cfc3a5; --ink:#2a2320; --danger:#e0452f;
-}
+:root{--s:34px;--bone:#e9dfc6;--bone-shade:#cfc3a5}
 *{box-sizing:border-box}
 html,body{
   margin:0;height:100%;background:transparent;overflow:hidden;
   font-family:"Kanit",system-ui,sans-serif;-webkit-tap-highlight-color:transparent;
 }
+body{display:flex;flex-direction:column;align-items:flex-end;padding:4px}
 
-/* ---------- ไม้ ---------- */
-.wood{
-  width:100%;height:100%;padding:8px 10px 10px;
-  display:flex;flex-direction:column;gap:6px;color:#f6e3bd;
+/* ป้ายไม้ที่โผล่มาแล้วหายไป */
+.plaque{
+  display:flex;align-items:center;gap:14px;padding:9px 16px;color:#f6e3bd;
   border:2px solid #2e1a0c;border-radius:12px;
   background:
     repeating-linear-gradient(91deg,transparent 0 7px,rgba(50,25,8,.16) 7px 8px,transparent 8px 19px),
     repeating-linear-gradient(89deg,rgba(255,225,170,.06) 0 3px,transparent 3px 13px),
-    radial-gradient(ellipse 60% 40% at 30% 35%,rgba(40,18,5,.28),transparent 70%),
     linear-gradient(180deg,#94623a,#78492a 55%,#5e3a1e);
-  box-shadow:
-    inset 0 1px 0 rgba(255,230,190,.4),
-    inset 0 -4px 8px rgba(0,0,0,.35),
-    0 4px 14px rgba(0,0,0,.5);
+  box-shadow:inset 0 1px 0 rgba(255,230,190,.4),inset 0 -4px 8px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(-10px) scale(.9);pointer-events:none;
+  transition:opacity .3s ease,transform .3s ease;
 }
-.top{display:flex;align-items:center;justify-content:space-between;height:30px}
-.count{
-  display:flex;align-items:baseline;gap:4px;font-weight:600;
+.plaque.in{opacity:1;transform:none}
+.plaque b{
+  min-width:1ch;font-size:2.1rem;font-weight:600;line-height:1;
   text-shadow:0 1px 0 rgba(0,0,0,.7),0 0 2px rgba(0,0,0,.6);
 }
-.count b{font-size:1.6rem;line-height:1;transition:color .3s}
-.count span{font-size:1.05rem;opacity:.8}
-.wood.full .count b{color:#ff9b86}
 
-#snd{
-  width:34px;height:34px;margin:-2px -4px -2px 0;padding:0;
-  display:grid;place-items:center;cursor:pointer;
-  color:#f6e3bd;background:transparent;border:0;border-radius:8px;
+/* ปุ่มเปิดเสียง (โผล่เฉพาะตอนเบราว์เซอร์บล็อกเสียง) */
+#pill{
+  margin-top:6px;font:inherit;font-size:.75rem;color:#f6e3bd;cursor:pointer;
+  padding:6px 12px;border-radius:99px;border:1px solid #2e1a0c;
+  background:linear-gradient(180deg,#94623a,#6e4526);
+  box-shadow:0 2px 8px rgba(0,0,0,.45);animation:need 1.2s ease-in-out infinite;
 }
-#snd:active{background:rgba(0,0,0,.2)}
-#snd:focus-visible{outline:2px solid #e8a24a}
-#snd .slash{display:none}
-#snd.off .slash{display:block}
-#snd.off .wave{display:none}
-#snd.off{opacity:.65}
-#snd.need{animation:need 1.2s ease-in-out infinite}
-@keyframes need{50%{background:rgba(232,162,74,.35)}}
+#pill[hidden]{display:none}
+@keyframes need{50%{box-shadow:0 0 0 4px rgba(232,162,74,.4)}}
 
-/* ---------- ช่องวางเต๋า ---------- */
-.slots{display:grid;grid-template-columns:repeat(3,var(--slot));gap:8px;justify-content:center}
-.slot{
-  width:var(--slot);height:var(--slot);border-radius:8px;display:grid;place-items:center;
-  background:rgba(30,14,4,.5);
-  box-shadow:inset 0 3px 5px rgba(0,0,0,.6),0 1px 0 rgba(255,220,170,.2);
-}
-
-/* ---------- เต๋า 3 มิติ ---------- */
+/* เต๋า 3 มิติ (ไม่โชว์หน้า) */
 .die{width:var(--s);height:var(--s);perspective:300px}
-.cube{position:relative;width:100%;height:100%;transform-style:preserve-3d}
-.die.idle .cube{animation:idle 5s ease-in-out infinite}
-.slot:nth-child(even) .die.idle .cube{animation-delay:-2.2s}
+.cube{position:relative;width:100%;height:100%;transform-style:preserve-3d;animation:idle 3.2s ease-in-out infinite}
 @keyframes idle{0%,100%{transform:rotateX(-18deg) rotateY(24deg)}50%{transform:rotateX(-10deg) rotateY(-26deg)}}
 .die.drop{animation:drop .5s cubic-bezier(.3,1.6,.5,1)}
-@keyframes drop{from{transform:translateY(-40px) scale(1.4);opacity:0}to{transform:none;opacity:1}}
-
+@keyframes drop{from{transform:translateY(-30px) scale(1.4);opacity:0}to{transform:none;opacity:1}}
 .face{
   position:absolute;inset:0;border-radius:6px;backface-visibility:hidden;
   background:radial-gradient(circle at 30% 25%,#f6eed8,var(--bone) 55%,var(--bone-shade));
-  border:1px solid rgba(0,0,0,.25);
-  display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:5px;
+  border:1px solid rgba(0,0,0,.25);display:grid;place-items:center;
 }
+.face::after{content:"";width:6px;height:6px;background:#b9ab87;transform:rotate(45deg)}
 .f1{transform:translateZ(calc(var(--s)/2))}
 .f2{transform:rotateY(90deg) translateZ(calc(var(--s)/2))}
 .f3{transform:rotateX(90deg) translateZ(calc(var(--s)/2))}
 .f4{transform:rotateX(-90deg) translateZ(calc(var(--s)/2))}
 .f5{transform:rotateY(-90deg) translateZ(calc(var(--s)/2))}
 .f6{transform:rotateY(180deg) translateZ(calc(var(--s)/2))}
-.pip{width:5px;height:5px;border-radius:50%;background:var(--ink);place-self:center;box-shadow:inset 0 1px 1px rgba(0,0,0,.6)}
-.f1 .pip{width:8px;height:8px;background:var(--danger)}
-.blank .face::after{content:"";width:6px;height:6px;background:#b9ab87;transform:rotate(45deg);place-self:center;grid-area:2/2}
-
-.die.hit{filter:drop-shadow(0 0 7px var(--danger));animation:pulse 1s ease-in-out infinite}
-.die.safe{opacity:.8}
-@keyframes pulse{50%{filter:drop-shadow(0 0 13px var(--danger))}}
 
 @media (prefers-reduced-motion:reduce){
-  .die.idle .cube,.die.drop,.die.hit,#snd.need{animation:none!important}
+  .cube,.die.drop,#pill{animation:none!important}
+  .plaque{transition:opacity .2s}
 }
