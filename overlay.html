@@ -10,19 +10,11 @@
   <link rel="stylesheet" href="overlay.css">
 </head>
 <body>
-<div id="wood" class="wood">
-  <div class="top">
-    <div class="count"><b id="n">0</b><span>/ 6</span></div>
-    <button id="snd" type="button" aria-label="เปิด/ปิดเสียง">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/>
-        <path class="wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>
-        <path class="slash" d="M3 3l18 18"/>
-      </svg>
-    </button>
-  </div>
-  <div id="slots" class="slots"></div>
+<div id="plaque" class="plaque" aria-live="polite">
+  <div id="dieHost"></div>
+  <b id="n">0</b>
 </div>
+<button id="pill" type="button" hidden>แตะเพื่อเปิดเสียง</button>
 <script type="module" src="overlay.js"></script>
 </body>
 </html>
