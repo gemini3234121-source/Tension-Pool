@@ -14,8 +14,8 @@ async function sync() {
     await OBR.popover.open({
       id: ID,
       url: "/Tension-Pool/overlay.html",
-      width: 168,
-      height: 148,
+      width: 150,
+      height: 104,
       anchorOrigin: { horizontal: "RIGHT", vertical: "TOP" },
       transformOrigin: { horizontal: "RIGHT", vertical: "TOP" },
       marginThreshold: 8,
