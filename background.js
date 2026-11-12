@@ -5,38 +5,42 @@ const ID = "com.tensionpool/overlay";
 
 let isGM = false;
 let visible = true;
-let prev = null;
+let opened = false;
 
-async function show() {
-  try { await OBR.popover.close(ID); } catch {}
-  await OBR.popover.open({
-    id: ID,
-    url: "/Tension-Pool/overlay.html",
-    width: 150,
-    height: 104,
-    anchorOrigin: { horizontal: "RIGHT", vertical: "TOP" },
-    transformOrigin: { horizontal: "RIGHT", vertical: "TOP" },
-    marginThreshold: 8,
-    hidePaper: true,
-    disableClickAway: true,
-  });
-}
-
-function onState(s) {
-  const count = s?.count ?? 0;
-  visible = s?.visible ?? true;
-  if (prev !== null && count > prev && !s?.roll && (isGM || visible)) show();
-  prev = count;
+async function sync() {
+  const want = isGM || visible;
+  if (want && !opened) {
+    opened = true;
+    await OBR.popover.open({
+      id: ID,
+      url: "/Tension-Pool/overlay.html",
+      // เปิดค้างไว้ที่ขนาด 1x1 (ไม่บังปุ่ม) แล้วให้ overlay ขยายเองตอนมีการเพิ่มเต๋า
+      width: 1,
+      height: 1,
+      anchorOrigin: { horizontal: "RIGHT", vertical: "TOP" },
+      transformOrigin: { horizontal: "RIGHT", vertical: "TOP" },
+      marginThreshold: 8,
+      hidePaper: true,
+      disableClickAway: true,
+    });
+  } else if (!want && opened) {
+    opened = false;
+    await OBR.popover.close(ID);
+  }
 }
 
 OBR.onReady(async () => {
   isGM = (await OBR.player.getRole()) === "GM";
   const meta = await OBR.room.getMetadata();
-  onState(meta[KEY]);
-  prev = meta[KEY]?.count ?? 0;
+  visible = meta[KEY]?.visible ?? true;
+  await sync();
 
   OBR.player.onChange(async () => {
     isGM = (await OBR.player.getRole()) === "GM";
+    sync();
   });
-  OBR.room.onMetadataChange((m) => onState(m[KEY]));
+  OBR.room.onMetadataChange((m) => {
+    visible = m[KEY]?.visible ?? true;
+    sync();
+  });
 });
