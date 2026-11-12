@@ -5,6 +5,7 @@ const BASE_ID = "com.tensionpool/overlay";
 
 let isGM = false;
 let prev = null;
+let prevRollId = null;
 let currentId = null; // id ของ popover ที่เปิดค้างอยู่ตอนนี้
 let seq = 0;
 
@@ -14,7 +15,7 @@ let seq = 0;
 // สำคัญ: ใช้ id ใหม่ "ทุกครั้ง" ที่เปิด เพื่อให้ Owlbear สร้าง iframe ใหม่เสมอ
 // ถ้าใช้ id เดิมแล้ว close->open ติดกัน ตัว host อาจมองว่าเป็น popover เดิม
 // ไม่โหลด overlay.html ใหม่ ทำให้ overlay.js ไม่ถูกรันซ้ำ (ไม่มีเสียง ไม่มีเต๋า)
-function show() {
+function show(mode = "add") {
   // ปิดอันเก่า "โดยไม่รอ" — ถ้า popover นั้นปิดตัวเองไปแล้ว คำสั่ง close อาจไม่ตอบกลับ
   // และ sendAsync จะค้างจน timeout 5 วิ ซึ่งจะทำให้เต๋าลูกถัดไปช้าไปด้วย
   if (currentId) {
@@ -27,7 +28,7 @@ function show() {
 
     OBR.popover.open({
     id,
-    url: `/Tension-Pool/overlay.html?v=4&id=${encodeURIComponent(id)}`,
+    url: `/Tension-Pool/overlay.html?v=5&mode=${mode}&id=${encodeURIComponent(id)}`,
     width: 150,
     height: 104,
     anchorOrigin: { horizontal: "RIGHT", vertical: "TOP" },
@@ -43,15 +44,22 @@ function show() {
 
 function onState(s) {
   const count = s?.count ?? 0;
+  const rollId = s?.roll?.id ?? null;
   const visible = s?.visible ?? true;
-  if (prev !== null && count > prev && !s?.roll && (isGM || visible)) show();
+  if (prev !== null && (isGM || visible)) {
+    // DM เพิ่งกดทอย (id ใหม่และเพิ่งเกิดขึ้น ไม่ใช่ค่าเก่าค้างใน metadata)
+    if (rollId && rollId !== prevRollId && Math.abs(Date.now() - rollId) < 15000) show("roll");
+    else if (count > prev && !s?.roll) show("add");
+  }
   prev = count;
+  prevRollId = rollId;
 }
 
 OBR.onReady(async () => {
   isGM = (await OBR.player.getRole()) === "GM";
   const meta = await OBR.room.getMetadata();
   prev = meta[KEY]?.count ?? 0;
+  prevRollId = meta[KEY]?.roll?.id ?? null;
 
   OBR.player.onChange(async () => {
     isGM = (await OBR.player.getRole()) === "GM";

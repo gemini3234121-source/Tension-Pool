@@ -155,16 +155,17 @@ function render() {
 /* ---------- การกระทำของ DM ---------- */
 const save = (patch) => OBR.room.setMetadata({ [KEY]: { ...state, ...patch } });
 
-/* ---------- เสียงตอนเพิ่มเต๋า ---------- */
+/* ---------- เสียงตอนเพิ่มเต๋า / ทอยเต๋า ---------- */
 // เล่นตรงนี้เพราะเกิดจากการคลิกของ DM เอง เบราว์เซอร์จึงไม่บล็อกเสียง
 // บันทึกเวลาไว้ให้ overlay.js รู้ จะได้ไม่เล่นซ้ำบนเครื่องเดียวกัน
 const addSound = new Audio("add.mp3");
-addSound.preload = "auto";
-addSound.volume = 0.85;
-function playAdd() {
+const rollSound = new Audio("roll.mp3");
+for (const a of [addSound, rollSound]) { a.preload = "auto"; a.volume = 0.85; }
+function playSound(a) {
   try { localStorage.setItem("tp:soundAt", String(Date.now())); } catch {}
-  try { addSound.currentTime = 0; addSound.play()?.catch(() => {}); } catch {}
+  try { a.currentTime = 0; a.play()?.catch((err) => console.warn("[Tension Pool] เล่นเสียงไม่ได้", err)); } catch {}
 }
+const playAdd = () => playSound(addSound);
 
 el.addTime.onclick = () => { playAdd(); save({ count: state.count + 1 }); };
 el.addNoise.onclick = () => { playAdd(); save({ count: state.count + 1 }); };
@@ -172,6 +173,7 @@ el.remove.onclick = () => save({ count: Math.max(0, state.count - 1) });
 el.reset.onclick = () => save({ count: 0, roll: null });
 el.visible.onchange = (e) => save({ visible: e.target.checked });
 el.roll.onclick = () => {
+  playSound(rollSound);
   const values = Array.from({ length: state.count }, () => 1 + Math.floor(Math.random() * 6));
   save({ roll: { id: Date.now(), values } });
 };

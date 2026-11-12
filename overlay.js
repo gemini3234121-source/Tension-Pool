@@ -1,12 +1,14 @@
 import OBR from "https://cdn.jsdelivr.net/npm/@owlbear-rodeo/sdk@3/+esm";
 
 const KEY = "com.tensionpool/state";
+const params = new URLSearchParams(location.search);
 // id ของ popover นี้ background.js สร้างใหม่ทุกครั้งแล้วส่งมาทาง ?id=...
 // ต้องปิดด้วย id เดียวกันนี้ ไม่งั้น close จะไม่โดน popover ตัวเอง
-const ID = new URLSearchParams(location.search).get("id") || "com.tensionpool/overlay";
-const SOUND = "add.mp3";   // ไฟล์เสียง วางไว้โฟลเดอร์เดียวกับ overlay.html
-const LEAD = 450;          // ms ที่รอหลังเสียงเริ่ม ก่อนเต๋าจะโผล่
-const HOLD = 1800;         // ms ที่เต๋ากับตัวเลขค้างอยู่ก่อนหาย
+const ID = params.get("id") || "com.tensionpool/overlay";
+const ROLL = params.get("mode") === "roll";   // true = DM เพิ่งกดทอย Pool
+const SOUND = ROLL ? "roll.mp3" : "add.mp3";  // ไฟล์เสียง วางไว้โฟลเดอร์เดียวกับ overlay.html
+const LEAD = ROLL ? 0 : 450;      // ms ที่รอหลังเสียงเริ่ม ก่อนเต๋าจะโผล่
+const HOLD = ROLL ? 2200 : 1800;  // ms ที่เต๋ากับตัวเลขค้างอยู่ก่อนหาย (ตอนทอยต้องรอให้เสียงเล่นจบก่อนปิด)
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const $ = (id) => document.getElementById(id);
@@ -65,5 +67,6 @@ function announce(count) {
 
 OBR.onReady(async () => {
   const meta = await OBR.room.getMetadata();
-  announce(meta[KEY]?.count ?? 0);
+  const st = meta[KEY];
+  announce(ROLL ? (st?.roll?.values?.length ?? st?.count ?? 0) : (st?.count ?? 0));
 });
