@@ -25,9 +25,9 @@ function show() {
   const id = `${BASE_ID}-${Date.now()}-${++seq}`;
   currentId = id;
 
-  OBR.popover.open({
+    OBR.popover.open({
     id,
-    url: `/Tension-Pool/overlay.html?id=${encodeURIComponent(id)}`,
+    url: `/Tension-Pool/overlay.html?v=4&id=${encodeURIComponent(id)}`,
     width: 150,
     height: 104,
     anchorOrigin: { horizontal: "RIGHT", vertical: "TOP" },
