@@ -1,6 +1,7 @@
 import OBR from "https://cdn.jsdelivr.net/npm/@owlbear-rodeo/sdk@3/+esm";
 
 const KEY = "com.tensionpool/state";
+const ID = "com.tensionpool/overlay";
 const SOUND = "add.mp3";   // ไฟล์เสียง วางไว้โฟลเดอร์เดียวกับ overlay.html
 const LEAD = 450;          // ms ที่รอหลังเสียงเริ่ม ก่อนเต๋าจะโผล่
 const HOLD = 1800;         // ms ที่เต๋ากับตัวเลขค้างอยู่ก่อนหาย
@@ -9,8 +10,6 @@ const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const $ = (id) => document.getElementById(id);
 const plaque = $("plaque"), nEl = $("n"), dieHost = $("dieHost"), pill = $("pill");
 
-let state = { count: 0, roll: null };
-let prev = null;
 let timers = [];
 let blocked = false;
 
@@ -36,7 +35,12 @@ function ping() {
     .catch(() => { blocked = true; pill.hidden = false; });
 }
 
-pill.onclick = () => { blocked = false; pill.hidden = true; ping(); };
+const close = () => OBR.popover.close(ID).catch(() => {});
+
+pill.onclick = () => {
+  blocked = false; pill.hidden = true; ping();
+  setTimeout(close, LEAD + HOLD + 400);
+};
 
 function announce(count) {
   timers.forEach(clearTimeout);
@@ -50,17 +54,12 @@ function announce(count) {
     plaque.classList.add("in");
   }, LEAD));
   timers.push(setTimeout(() => plaque.classList.remove("in"), LEAD + HOLD));
-}
-
-function onState(next) {
-  state = { count: 0, roll: null, ...next };
-  // แสดงเฉพาะตอนเพิ่มเต๋า (ไม่แสดงตอนโหลดครั้งแรก ลบ รีเซ็ต หรือทอย)
-  if (prev !== null && state.count > prev && !state.roll) announce(state.count);
-  prev = state.count;
+  // ปิด popover หลังแอนิเมชันจบ เพื่อไม่ให้บังปุ่ม (ถ้าเสียงถูกบล็อก รอให้กดปุ่มก่อน)
+  timers.push(setTimeout(() => { if (!blocked) close(); }, LEAD + HOLD + 400));
+  timers.push(setTimeout(close, 20000));
 }
 
 OBR.onReady(async () => {
   const meta = await OBR.room.getMetadata();
-  onState(meta[KEY] ?? {});
-  OBR.room.onMetadataChange((m) => onState(m[KEY] ?? {}));
+  announce(meta[KEY]?.count ?? 0);
 });
