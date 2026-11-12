@@ -155,8 +155,19 @@ function render() {
 /* ---------- การกระทำของ DM ---------- */
 const save = (patch) => OBR.room.setMetadata({ [KEY]: { ...state, ...patch } });
 
-el.addTime.onclick = () => save({ count: state.count + 1 });
-el.addNoise.onclick = () => save({ count: state.count + 1 });
+/* ---------- เสียงตอนเพิ่มเต๋า ---------- */
+// เล่นตรงนี้เพราะเกิดจากการคลิกของ DM เอง เบราว์เซอร์จึงไม่บล็อกเสียง
+// บันทึกเวลาไว้ให้ overlay.js รู้ จะได้ไม่เล่นซ้ำบนเครื่องเดียวกัน
+const addSound = new Audio("add.mp3");
+addSound.preload = "auto";
+addSound.volume = 0.85;
+function playAdd() {
+  try { localStorage.setItem("tp:soundAt", String(Date.now())); } catch {}
+  try { addSound.currentTime = 0; addSound.play()?.catch(() => {}); } catch {}
+}
+
+el.addTime.onclick = () => { playAdd(); save({ count: state.count + 1 }); };
+el.addNoise.onclick = () => { playAdd(); save({ count: state.count + 1 }); };
 el.remove.onclick = () => save({ count: Math.max(0, state.count - 1) });
 el.reset.onclick = () => save({ count: 0, roll: null });
 el.visible.onchange = (e) => save({ visible: e.target.checked });
