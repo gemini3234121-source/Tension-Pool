@@ -39,6 +39,12 @@ function ping() {
   }
 }
 
+// ถ้าเครื่องนี้เป็นเครื่องที่ DM กดเพิ่มเอง app.js เล่นเสียงไปแล้ว ไม่ต้องเล่นซ้ำ
+function playedRecently() {
+  try { return Date.now() - Number(localStorage.getItem("tp:soundAt") || 0) < 6000; }
+  catch { return false; }
+}
+
 const close = () => OBR.popover.close(ID).catch((err) => console.warn("[Tension Pool] ปิด overlay ไม่ได้", err));
 
 function announce(count) {
@@ -47,7 +53,7 @@ function announce(count) {
   plaque.classList.remove("in");
   nEl.textContent = count;
 
-  ping(); // เสียงมาก่อน
+  if (!playedRecently()) ping();
   timers.push(setTimeout(() => {
     dieHost.replaceChildren(makeDie());
     plaque.classList.add("in");
