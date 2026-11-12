@@ -35,11 +35,13 @@ function ping() {
     .catch(() => { blocked = true; pill.hidden = false; });
 }
 
-const close = () => OBR.popover.close(ID).catch(() => {});
+const W = 150, H = 104;
+const expand = () => Promise.all([OBR.popover.setWidth(ID, W), OBR.popover.setHeight(ID, H)]).catch(() => {});
+const shrink = () => Promise.all([OBR.popover.setWidth(ID, 1), OBR.popover.setHeight(ID, 1)]).catch(() => {});
 
 pill.onclick = () => {
   blocked = false; pill.hidden = true; ping();
-  setTimeout(close, LEAD + HOLD + 400);
+  timers.push(setTimeout(shrink, LEAD + HOLD + 400));
 };
 
 function announce(count) {
@@ -48,18 +50,28 @@ function announce(count) {
   plaque.classList.remove("in");
   nEl.textContent = count;
 
+  expand();
   ping(); // เสียงมาก่อน
   timers.push(setTimeout(() => {
     dieHost.replaceChildren(makeDie());
     plaque.classList.add("in");
   }, LEAD));
   timers.push(setTimeout(() => plaque.classList.remove("in"), LEAD + HOLD));
-  // ปิด popover หลังแอนิเมชันจบ เพื่อไม่ให้บังปุ่ม (ถ้าเสียงถูกบล็อก รอให้กดปุ่มก่อน)
-  timers.push(setTimeout(() => { if (!blocked) close(); }, LEAD + HOLD + 400));
-  timers.push(setTimeout(close, 20000));
+  // หดกลับเป็น 1x1 เมื่อจบ จะได้ไม่บังปุ่ม (ถ้าเสียงถูกบล็อก รอให้กดปุ่มก่อน)
+  timers.push(setTimeout(() => { if (!blocked) shrink(); }, LEAD + HOLD + 400));
+  timers.push(setTimeout(shrink, 20000));
+}
+
+let prev = null;
+function onState(next) {
+  const st = { count: 0, roll: null, ...next };
+  // แสดงเฉพาะตอนเพิ่มเต๋า (ไม่แสดงตอนโหลดครั้งแรก ลบ รีเซ็ต หรือทอย)
+  if (prev !== null && st.count > prev && !st.roll) announce(st.count);
+  prev = st.count;
 }
 
 OBR.onReady(async () => {
   const meta = await OBR.room.getMetadata();
-  announce(meta[KEY]?.count ?? 0);
+  onState(meta[KEY] ?? {});
+  OBR.room.onMetadataChange((m) => onState(m[KEY] ?? {}));
 });
