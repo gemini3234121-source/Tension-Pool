@@ -10,10 +10,9 @@ const HOLD = 1800;         // ms ที่เต๋ากับตัวเล�
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const $ = (id) => document.getElementById(id);
-const plaque = $("plaque"), nEl = $("n"), dieHost = $("dieHost"), pill = $("pill");
+const plaque = $("plaque"), nEl = $("n"), dieHost = $("dieHost");
 
 let timers = [];
-let blocked = false;
 
 function makeDie() {
   const die = document.createElement("div");
@@ -29,23 +28,18 @@ function makeDie() {
   return die;
 }
 
+// พยายามเล่นเสียง ถ้าเบราว์เซอร์บล็อกก็ข้ามไปเงียบ ๆ (ไม่มีปุ่ม ไม่ค้างหน้าจอ)
 function ping() {
-  const a = new Audio(SOUND);
-  a.volume = 0.85;
-  a.play()
-    .then(() => { blocked = false; pill.hidden = true; })
-    .catch((err) => {
-      console.warn("[Tension Pool] เล่นเสียงไม่ได้", err);
-      blocked = true; pill.hidden = false;
-    });
+  try {
+    const a = new Audio(SOUND);
+    a.volume = 0.85;
+    a.play()?.catch((err) => console.warn("[Tension Pool] เล่นเสียงไม่ได้", err));
+  } catch (err) {
+    console.warn("[Tension Pool] เล่นเสียงไม่ได้", err);
+  }
 }
 
 const close = () => OBR.popover.close(ID).catch((err) => console.warn("[Tension Pool] ปิด overlay ไม่ได้", err));
-
-pill.onclick = () => {
-  blocked = false; pill.hidden = true; ping();
-  setTimeout(close, LEAD + HOLD + 400);
-};
 
 function announce(count) {
   timers.forEach(clearTimeout);
@@ -59,9 +53,8 @@ function announce(count) {
     plaque.classList.add("in");
   }, LEAD));
   timers.push(setTimeout(() => plaque.classList.remove("in"), LEAD + HOLD));
-  // ปิด popover หลังแอนิเมชันจบ เพื่อไม่ให้บังปุ่ม (ถ้าเสียงถูกบล็อก รอให้กดปุ่มก่อน)
-  timers.push(setTimeout(() => { if (!blocked) close(); }, LEAD + HOLD + 400));
-  timers.push(setTimeout(close, 20000));
+  // ปิด popover หลังแอนิเมชันจบ เพื่อไม่ให้บังปุ่ม
+  timers.push(setTimeout(close, LEAD + HOLD + 400));
 }
 
 OBR.onReady(async () => {
